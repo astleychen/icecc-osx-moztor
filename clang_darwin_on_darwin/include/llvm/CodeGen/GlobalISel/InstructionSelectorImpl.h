@@ -22,11 +22,11 @@
 #include "llvm/CodeGen/MachineInstrBuilder.h"
 #include "llvm/CodeGen/MachineOperand.h"
 #include "llvm/CodeGen/MachineRegisterInfo.h"
+#include "llvm/CodeGen/TargetInstrInfo.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include "llvm/Target/TargetInstrInfo.h"
 #include "llvm/Target/TargetOpcodes.h"
 #include "llvm/Target/TargetRegisterInfo.h"
 #include <cassert>
@@ -401,7 +401,7 @@ bool InstructionSelector::executeMatchTable(
                       dbgs() << CurrentIdx << ": GIM_CheckIsSafeToFold(MIs["
                              << InsnID << "])\n");
       assert(State.MIs[InsnID] != nullptr && "Used insn before defined");
-      if (!isObviouslySafeToFold(*State.MIs[InsnID])) {
+      if (!isObviouslySafeToFold(*State.MIs[InsnID], *State.MIs[0])) {
         if (handleReject() == RejectAndGiveUp)
           return false;
       }

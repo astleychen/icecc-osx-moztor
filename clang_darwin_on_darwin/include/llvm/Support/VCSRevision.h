@@ -1,1 +1,1 @@
-#define LLVM_REVISION "svn-r317612"
+#define LLVM_REVISION "svn-r318026"

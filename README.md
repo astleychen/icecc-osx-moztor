@@ -1,7 +1,7 @@
-# Icecream Setup for Mac OS X (Mozilla Toronto Office)
+# Icecream Setup for macOS (Mozilla Taipei Office)
 
 Want to build a clobber of Firefox in 5 minutes on your Mac laptop in the
-Toronto office? Here are the instructions for you!
+Taipei office? Here are the instructions for you!
 
 ## Instructions
 
@@ -16,14 +16,14 @@ Clone this repository, this will take a while because it contains a binary copy
 of a clang toolchain (which is a gross thing to keep in git, I know)
 
 ```bash
-$ git clone https://github.com/mstange/icecc-osx-moztor ~/icecream
+$ git clone https://github.com/astleychen/icecc-osx-moztor ~/icecream
 ```
 
 Install the daemon. This will create a launchd plist which will be run on startup.
 The argument passed to the `install.sh` script is the scheduler to connect to.
 
 ```bash
-$ sudo ~/icecream/install.sh 10.242.24.68
+$ sudo ~/icecream/install.sh 10.247.24.135
 ```
 
 Update your mozconfig to point cc and c++ to the compiler wrappers
@@ -72,12 +72,12 @@ Either ask someone on a linux computer to run `icemon` to get pretty graphics,
 or `telnet` into the server,
 
 ```bash
-$ telnet 10.242.24.68 8766
+$ telnet 10.247.24.135 8766
 ```
 
 ## Updating the clang bundle
 
-The clang bundle in this repo was built from llvm svn revision 317612.
+The clang bundle in this repo was built from llvm svn revision 318026.
 
 Here are the steps you need to follow if you want to update the bundle to a
 different revision:
@@ -102,15 +102,15 @@ First, prepare the Linux compiler bundle:
 
 3. Build clang. This should be done in a `build` directory next to the `llvm`
    directory, using CMake.
-   Here are the commands I used to do this. I'm specifying `~/code/clang_darwin_on_linux/ `
-   as the install path. I also have icecream compiler wrapper scripts in `~/.bin/`,
+   Here are the commands I used to do this. I'm specifying `~/icecc-bundle/clang_darwin_on_linux/ `
+   as the install path. I also have icecream compiler wrapper scripts in `~/icecc-wrapper/`,
    so I'm using an existing icecream setup on the Linux machine to compile clang.
 
     ```
     mkdir build
     cd build
-    CC=~/.bin/gcc CXX=~/.bin/g++ cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DLLVM_DEFAULT_TARGET_TRIPLE=x86_64-apple-darwin16.0.0 -DCMAKE_INSTALL_PREFIX:PATH=~/code/clang_darwin_on_linux/ ../llvm
-    ninja -j100 && ninja install
+    CC=/usr/bin/gcc CXX=/usr/bin/g++ cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DLLVM_DEFAULT_TARGET_TRIPLE=x86_64-apple-darwin16.0.0 -DCMAKE_INSTALL_PREFIX:PATH=~/icecc-bundle/clang_darwin_on_linux/ ../llvm
+    ninja -j8 && ninja install
     ```
 
 4. Create the `clang_darwin_on_linux` package using the `icecc-create-env` tool from the [mozilla-osx branch of Benoit's icecream repo](https://github.com/bgirard/icecream/):
@@ -122,7 +122,7 @@ First, prepare the Linux compiler bundle:
       cd icecream/
       ./autogen.sh
       CC=~/.bin/gcc CXX=~/.bin/g++ ./configure
-      make -j100
+      make -j8
       chmod +x client/icecc-create-env
       ```
 
@@ -162,15 +162,15 @@ Now it's time to compile clang for macOS.
    cd ../../..
    ```
 
-3. Build clang on macOS. I used these commands (which will produce a clang installation at `~/code/clang_darwin_on_darwin/`):
+3. Build clang on macOS. I used these commands (which will produce a clang installation at `~/icecc-bundle/clang_darwin_on_darwin/`):
 
    ```
    mkdir build
    cd build
-   cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DLLVM_DEFAULT_TARGET_TRIPLE=x86_64-apple-darwin16.0.0 -DDEFAULT_SYSROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/ -DCMAKE_INSTALL_PREFIX:PATH=~/code/clang_darwin_on_darwin/ ../llvm
+   cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DLLVM_DEFAULT_TARGET_TRIPLE=x86_64-apple-darwin16.0.0 -DDEFAULT_SYSROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/ -DCMAKE_INSTALL_PREFIX:PATH=~/icecc-bundle/clang_darwin_on_darwin/ ../llvm
    ninja -j8 && ninja install
    ```
 
-4. Replace the `clang_darwin_on_darwin` directory in this directory with the one that the previous build command produced in `~/code/`.
+4. Replace the `clang_darwin_on_darwin` directory in this directory with the one that the previous build command produced in `~/icecc-bundle/`.
 
 This concludes the update. You can now adjust the llvm revision mentioned in this readme (at the start of this section), and commit and push your changes.
